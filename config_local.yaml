@@ -1,0 +1,5 @@
+database:
+
+server:
+  - address: localhost
+  - port: 8081
