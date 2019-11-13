@@ -7,14 +7,12 @@ import (
 )
 
 func init() {
-	viper.SetConfigFile(`config_local.yaml`)
+	viper.SetConfigName("config")
+	viper.SetConfigFile(`config.json`)
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
-	}
-
-	if viper.GetBool(`debug`) {
-		fmt.Println("Service RUN on DEBUG mode")
 	}
 }
 

@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/viper"
-	"log"
 	"net/http"
 )
 
@@ -12,16 +11,16 @@ type Server struct {
 	Port string
 }
 
-var defaultConfig Server
-
 func init() {
 	if viper.GetBool(`debug`) {
 
 	}
 }
 
-func NewServer(server Server) *Server {
+func NewServer(sv Server) *Server {
 	server := new(Server)
+	server.Addres = sv.Addres
+	server.Port = sv.Port
 	return server
 }
 
