@@ -52,7 +52,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("Server started on port: %s", viper.Get("server.port"))
+	fmt.Printf("Server started on port: %s\n", viper.Get("server.port"))
 	if err := sv.StartServer(); err != nil {
 		panic(err)
 	}

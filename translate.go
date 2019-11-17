@@ -66,6 +66,11 @@ func (sv *Server) TranslationWords(w http.ResponseWriter, r *http.Request) {
 
 	var words []Translate
 
+	if _, err := sv.Csv.Seek(0, io.SeekStart); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
 	reader = csv.NewReader(bufio.NewReader(sv.Csv))
 
 	for {
