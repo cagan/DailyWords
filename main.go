@@ -3,16 +3,18 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
-	"os"
 
 	_ "github.com/jasonlvhit/gocron"
 	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 )
 
-func init() {
+type Config struct {
+	Address string
+	Port    string
+}
 
+func init() {
 	viper.SetConfigName("config")
 	viper.SetConfigFile(`config.json`)
 	err := viper.ReadInConfig()
@@ -40,26 +42,18 @@ func main() {
 
 	go cron.StartCron()
 
-	// os.Exit(0)
-
-	mux := http.NewServeMux()
-	env := os.Getenv("ENVIRONMENT")
-	if env == "dev" {
-		fmt.Println("Development Environment")
-	}
-
-	defaultConfig := Server{
+	defaultConfig := Config{
 		Address: viper.GetString("server.address"),
 		Port:    viper.GetString("server.port"),
 	}
 
-	sv := NewServer(defaultConfig)
-
-	mux.HandleFunc("/words", TranslationWords)
+	sv, err := NewServer(defaultConfig)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	fmt.Printf("Server started on port: %s", viper.Get("server.port"))
-	err := StartServer(sv, mux)
-	if err != nil {
+	if err := sv.StartServer(); err != nil {
 		panic(err)
 	}
 

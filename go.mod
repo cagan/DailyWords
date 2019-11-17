@@ -3,6 +3,7 @@ module github.com/cagans42/DailyWords
 go 1.13
 
 require (
+	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-redis/cache/v7 v7.0.2 // indirect
 	github.com/go-redis/redis v6.15.5+incompatible
 	github.com/gorilla/mux v1.7.3 // indirect
