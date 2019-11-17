@@ -47,7 +47,7 @@ func (sv *Server) StartServer() error {
 	}
 	mux.HandleFunc("/words", sv.TranslationWords)
 
-	err := http.ListenAndServe(fmt.Sprintf("%s:%s", sv.Address, sv.Port), mux)
+	err := http.ListenAndServe(fmt.Sprintf("%s:%s", sv.Address, sv.Port), secure(mux))
 	if err != nil {
 		return err
 	}
@@ -62,6 +62,13 @@ func (sv *Server) StartServer() error {
 	}
 
 	return nil
+}
+
+func secure(h http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "https://postwoman.io")
+		h.ServeHTTP(w, r)
+	})
 }
 
 func (sv *Server) watchFileUpdates() {
