@@ -7,7 +7,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 )
 
 var (
@@ -33,7 +32,7 @@ type TranslationOptions struct {
 // 	reader = csv.NewReader(bufio.NewReader(csvFile))
 // }
 
-func TranslationWords(w http.ResponseWriter, r *http.Request) {
+func (sv *Server) TranslationWords(w http.ResponseWriter, r *http.Request) {
 	// var limit int
 	// if limitStr := r.FormValue("limit"); limitStr == "" {
 	// 	http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
@@ -67,12 +66,12 @@ func TranslationWords(w http.ResponseWriter, r *http.Request) {
 
 	var words []Translate
 
-	csvFile, err := os.Open("eng_tur.csv")
-	if err != nil {
-		panic("Can not open csv file")
+	if _, err := sv.Csv.Seek(0, io.SeekStart); err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
-	defer csvFile.Close()
-	reader = csv.NewReader(bufio.NewReader(csvFile))
+
+	reader = csv.NewReader(bufio.NewReader(sv.Csv))
 
 	for {
 		line, err := reader.Read()
