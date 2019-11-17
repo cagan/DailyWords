@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/jasonlvhit/gocron"
 )
 
@@ -45,7 +43,7 @@ func (c *Cron) StartCron() {
 	}
 
 	if c.At == "" {
-		job.DoSafely(func(a string) { fmt.Println(a) }, "horse")
+		job.DoSafely(c.Actions)
 	} else {
 		job.At(c.At).DoSafely(c.Actions)
 	}

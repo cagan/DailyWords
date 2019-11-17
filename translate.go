@@ -4,12 +4,10 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 )
 
 var (
@@ -22,38 +20,59 @@ type Translate struct {
 }
 
 type TranslationOptions struct {
-	Limit int `json:"limit"`
+	Limit    int    `json:"limit"`
 	FromLang string `json:"from_lang"`
-	ToLang string `json:"to_lang"`
+	ToLang   string `json:"to_lang"`
 }
 
-func init() {
+// func init() {
+// 	csvFile, err := os.Open("eng_tur.csv")
+// 	if err != nil {
+// 		panic("Can not open csv file")
+// 	}
+// 	reader = csv.NewReader(bufio.NewReader(csvFile))
+// }
+
+func TranslationWords(w http.ResponseWriter, r *http.Request) {
+	// var limit int
+	// if limitStr := r.FormValue("limit"); limitStr == "" {
+	// 	http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+	// 	return
+	// } else {
+	// 	var err error
+	// 	limit, err = strconv.Atoi(limitStr)
+	// 	if err != nil {
+	// 		http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+	// 		return
+	// 	}
+	// }
+	//
+	// from := r.FormValue("from")
+	// if from == "" {
+	// 	http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+	// 	return
+	// }
+	//
+	// to := r.FormValue("to")
+	// if to == "" {
+	// 	http.Error(w, http.StatusText(http.StatusUnprocessableEntity), http.StatusUnprocessableEntity)
+	// 	return
+	// }
+	//
+	// opts := TranslationOptions{
+	// 	Limit:    limit,
+	// 	FromLang: from,
+	// 	ToLang:   to,
+	// }
+
+	var words []Translate
+
 	csvFile, err := os.Open("eng_tur.csv")
 	if err != nil {
 		panic("Can not open csv file")
 	}
+	defer csvFile.Close()
 	reader = csv.NewReader(bufio.NewReader(csvFile))
-}
-
-func TranslationWords(w http.ResponseWriter, r *http.Request) {
-	queryVal := r.URL.Query()
-
-	fmt.Println(queryVal["limit"][0])
-	opts := TranslationOptions{}
-
-	if queryVal["limit"] != nil {
-		opts.Limit, _ = strconv.Atoi(queryVal["limit"][0])
-	}
-
-	if queryVal["from"] != nil {
-		opts.FromLang = queryVal["from"][0]
-	}
-
-	if queryVal["to"] != nil {
-		opts.ToLang = queryVal["to"][0]
-	}
-
-	var words[] Translate
 
 	for {
 		line, err := reader.Read()
@@ -63,18 +82,20 @@ func TranslationWords(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 
-		words = append(words, Translate{
-			Word:      line[0] ,
-			Provision: line[1],
-		})
+		if len(line) > 0 {
+			words = append(words, Translate{
+				Word:      line[0],
+				Provision: line[1],
+			})
+		}
 	}
 
-	js, err := json.Marshal(words)
+	b, err := json.Marshal(words)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	_, _ = w.Write(js)
+	w.Write(b)
 }

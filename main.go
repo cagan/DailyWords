@@ -57,10 +57,10 @@ func main() {
 
 	mux.HandleFunc("/words", TranslationWords)
 
+	fmt.Printf("Server started on port: %s", viper.Get("server.port"))
 	err := StartServer(sv, mux)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Server started on port: %s", viper.Get("server.port"))
 }
