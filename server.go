@@ -17,7 +17,7 @@ func NewServer(sv Server) *Server {
 	return server
 }
 
-func StartServer(sv Server, mux *http.ServeMux) error {
+func StartServer(sv *Server, mux *http.ServeMux) error {
 	err := http.ListenAndServe(fmt.Sprintf("%s:%s", sv.Address, sv.Port), mux)
 
 	if err != nil {

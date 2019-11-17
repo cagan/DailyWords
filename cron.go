@@ -1,62 +1,62 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/jasonlvhit/gocron"
 )
 
 type Cron struct {
-	Second bool
-	Minute bool
-	Hour bool
-	Day bool
-	Week bool
-	Every uint64
-	At string
+	Second  bool
+	Minute  bool
+	Hour    bool
+	Day     bool
+	Week    bool
+	Every   uint64
+	At      string
 	Actions map[string]func()
 }
 
 func NewCron(c Cron) *Cron {
 	return &Cron{
-		Second:     c.Second,
-		Minute:     c.Minute,
-		Hour:       c.Hour,
-		Day:        c.Day,
-		Week:       c.Week,
-		Every:      c.Every,
-		At: c.At,
-		Actions: 	c.Actions,
+		Second:  c.Second,
+		Minute:  c.Minute,
+		Hour:    c.Hour,
+		Day:     c.Day,
+		Week:    c.Week,
+		Every:   c.Every,
+		At:      c.At,
+		Actions: c.Actions,
 	}
 }
 
-func StartCron(c Cron) {
+func (c *Cron) StartCron() {
 	sch := gocron.NewScheduler()
-	evr := sch.Every(c.Every)
+	job := sch.Every(c.Every)
 
 	if c.Second {
-		evr = evr.Second()
+		job = job.Second()
 	} else if c.Minute {
-		evr = evr.Minute()
+		job = job.Minute()
 	} else if c.Hour {
-		evr = evr.Hour()
+		job = job.Hour()
 	} else if c.Day {
-		evr = evr.Day()
+		job = job.Day()
 	}
 
 	if c.At == "" {
-		evr.DoSafely(c.Actions)
+		job.DoSafely(func(a string) { fmt.Println(a) }, "horse")
 	} else {
-		evr.At(c.At).DoSafely(c.Actions)
+		job.At(c.At).DoSafely(c.Actions)
 	}
 
-	<- sch.Start()
+	<-sch.Start()
 }
 
-func removeTask(task func()){
+func removeTask(task func()) {
 	gocron.Remove(task)
 }
 
 func clearAllJobs() {
 	gocron.Clear()
 }
-
-

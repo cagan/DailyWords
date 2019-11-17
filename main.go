@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	_ "github.com/jasonlvhit/gocron"
-	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/jasonlvhit/gocron"
+	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
 func init() {
@@ -26,21 +27,20 @@ func init() {
 }
 
 func main() {
-
-	cron := NewCron(Cron{
+	cron := &Cron{
 		Second:  true,
 		Minute:  false,
 		Hour:    false,
 		Day:     false,
 		Week:    false,
-		Every:   22,
+		Every:   1,
 		At:      "",
 		Actions: nil,
-	})
+	}
 
-	StartCron(*cron)
+	go cron.StartCron()
 
-	os.Exit(0)
+	// os.Exit(0)
 
 	mux := http.NewServeMux()
 	env := os.Getenv("ENVIRONMENT")
@@ -57,7 +57,7 @@ func main() {
 
 	mux.HandleFunc("/words", TranslationWords)
 
-	err := StartServer(*sv, mux)
+	err := StartServer(sv, mux)
 	if err != nil {
 		panic(err)
 	}
